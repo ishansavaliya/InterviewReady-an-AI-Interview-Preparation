@@ -88,8 +88,12 @@ export const Feedback = () => {
     }
   }, [interviewId, navigate, userId]);
 
-  //   calculate the ratings out of 10
+  // Add this helper function
+  const convertToFivePoint = (rating: number): string => {
+    return ((rating / 10) * 5).toFixed(1);
+  };
 
+  // Modify the overAllRating calculation
   const overAllRating = useMemo(() => {
     if (feedbacks.length === 0) return "0.0";
 
@@ -98,7 +102,8 @@ export const Feedback = () => {
       0
     );
 
-    return (totalRatings / feedbacks.length).toFixed(1);
+    const tenPointRating = totalRatings / feedbacks.length;
+    return convertToFivePoint(tenPointRating);
   }, [feedbacks]);
 
   if (isLoading) {
@@ -128,7 +133,7 @@ export const Feedback = () => {
       <p className="text-base text-muted-foreground">
         Your overall interview ratings :{" "}
         <span className="text-emerald-500 font-semibold text-xl">
-          {overAllRating} / 10
+          {overAllRating} / 5
         </span>
       </p>
 
@@ -159,7 +164,7 @@ export const Feedback = () => {
               <AccordionContent className="px-5 py-6 bg-white rounded-b-lg space-y-5 shadow-inner">
                 <div className="text-lg font-semibold to-gray-700">
                   <Star className="inline mr-2 text-yellow-400" />
-                  Rating : {feed.rating}
+                  Rating : {convertToFivePoint(feed.rating)} / 5
                 </div>
 
                 <Card className="border-none space-y-3 p-4 bg-green-50 rounded-lg shadow-md">
