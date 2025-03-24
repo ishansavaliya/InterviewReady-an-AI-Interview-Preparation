@@ -73,15 +73,9 @@ export const Footer = () => {
           <div>
             <h3 className="font-bold text-lg mb-4">Services</h3>
             <ul>
-              <FooterLink to="/services/interview-prep">
-                Interview Preparation
-              </FooterLink>
-              <FooterLink to="/services/career-coaching">
-                Career Coaching
-              </FooterLink>
-              <FooterLink to="/services/resume-building">
-                Resume Building
-              </FooterLink>
+              <FooterLink to="/services">Interview Preparation</FooterLink>
+              <FooterLink to="/services">Career Coaching</FooterLink>
+              <FooterLink to="/services">Resume Building</FooterLink>
             </ul>
           </div>
 
