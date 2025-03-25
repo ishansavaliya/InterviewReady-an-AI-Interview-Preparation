@@ -1,3 +1,9 @@
+/**
+ * Header Component
+ * Main application header with navigation and user controls
+ * Provides responsive layout for desktop and mobile views
+ */
+
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/clerk-react";
 import { Container } from "./container";
@@ -7,6 +13,14 @@ import { NavLink } from "react-router-dom";
 import { ProfileContainer } from "./profile-container";
 import { ToggleContainer } from "./toggle-container";
 
+/**
+ * Header Component
+ * Renders the main application header with:
+ * - Logo and branding
+ * - Navigation menu (desktop)
+ * - User profile controls
+ * - Mobile menu toggle
+ */
 const Header = () => {
   const { userId } = useAuth();
 
@@ -16,10 +30,10 @@ const Header = () => {
     >
       <Container>
         <div className="flex items-center gap-4 w-full">
-          {/* logo section */}
+          {/* Logo Section */}
           <LogoContainer />
 
-          {/* navigation section */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-3">
             <NavigationRoutes />
             {userId && (
@@ -37,11 +51,12 @@ const Header = () => {
             )}
           </nav>
 
+          {/* User Controls */}
           <div className="ml-auto flex items-center gap-6">
-            {/* profile section */}
+            {/* Profile Section */}
             <ProfileContainer />
 
-            {/* mobile toggle section */}
+            {/* Mobile Menu Toggle */}
             <ToggleContainer />
           </div>
         </div>

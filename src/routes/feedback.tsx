@@ -1,3 +1,10 @@
+/**
+ * Feedback Route Component
+ * Displays detailed feedback for a completed mock interview
+ * Shows overall rating, individual question feedback, and comparison with expected answers
+ */
+
+// Import dependencies
 import { db } from "@/config/firebase.config";
 import { Interview, UserAnswer } from "@/types";
 import { useAuth } from "@clerk/clerk-react";
@@ -12,6 +19,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+
+// Import components
 import { LoaderPage } from "./loader-page";
 import { CustomBreadCrumb } from "@/components/custom-bread-crumb";
 import { Headings } from "@/components/headings";
@@ -26,7 +35,12 @@ import { cn } from "@/lib/utils";
 import { CircleCheck, Star } from "lucide-react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
+/**
+ * Feedback Component
+ * Renders detailed feedback for a completed mock interview session
+ */
 export const Feedback = () => {
+  // Route parameters and state management
   const { interviewId } = useParams<{ interviewId: string }>();
   const [interview, setInterview] = useState<Interview | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,11 +49,18 @@ export const Feedback = () => {
   const { userId } = useAuth();
   const navigate = useNavigate();
 
+  // Redirect if no interview ID is provided
   if (!interviewId) {
     navigate("/generate", { replace: true });
   }
+
+  /**
+   * Effect hook to fetch interview and feedback data
+   * Runs when interviewId or userId changes
+   */
   useEffect(() => {
     if (interviewId) {
+      // Fetch interview details
       const fetchInterview = async () => {
         if (interviewId) {
           try {
@@ -58,6 +79,7 @@ export const Feedback = () => {
         }
       };
 
+      // Fetch user's answers and feedback
       const fetchFeedbacks = async () => {
         setIsLoading(true);
         try {
@@ -88,12 +110,17 @@ export const Feedback = () => {
     }
   }, [interviewId, navigate, userId]);
 
-  // Add this helper function
+  /**
+   * Helper function to convert 10-point rating to 5-point scale
+   */
   const convertToFivePoint = (rating: number): string => {
     return ((rating / 10) * 5).toFixed(1);
   };
 
-  // Modify the overAllRating calculation
+  /**
+   * Calculate overall interview rating
+   * Converts average of all question ratings to 5-point scale
+   */
   const overAllRating = useMemo(() => {
     if (feedbacks.length === 0) return "0.0";
 
@@ -106,12 +133,14 @@ export const Feedback = () => {
     return convertToFivePoint(tenPointRating);
   }, [feedbacks]);
 
+  // Show loading state while fetching data
   if (isLoading) {
     return <LoaderPage className="w-full h-[70vh]" />;
   }
 
   return (
     <div className="flex flex-col w-full gap-8 py-5">
+      {/* Navigation Breadcrumb */}
       <div className="flex items-center justify-between w-full gap-2">
         <CustomBreadCrumb
           breadCrumbPage={"Feedback"}
@@ -125,11 +154,13 @@ export const Feedback = () => {
         />
       </div>
 
+      {/* Header Section */}
       <Headings
         title="Congratulations !"
         description="Your personalized feedback is now available. Dive in to see your strengths, areas for improvement, and tips to help you ace your next interview."
       />
 
+      {/* Overall Rating Display */}
       <p className="text-base text-muted-foreground">
         Your overall interview ratings :{" "}
         <span className="text-emerald-500 font-semibold text-xl">
@@ -137,10 +168,13 @@ export const Feedback = () => {
         </span>
       </p>
 
+      {/* Interview Details Pin */}
       {interview && <InterviewPin interview={interview} onMockPage />}
 
+      {/* Feedback Section Header */}
       <Headings title="Interview Feedback" isSubHeading />
 
+      {/* Feedback Accordion */}
       {feedbacks && (
         <Accordion type="single" collapsible className="space-y-6">
           {feedbacks.map((feed) => (
@@ -149,6 +183,7 @@ export const Feedback = () => {
               value={feed.id}
               className="border rounded-lg shadow-md"
             >
+              {/* Question Header */}
               <AccordionTrigger
                 onClick={() => setActiveFeed(feed.id)}
                 className={cn(
@@ -161,40 +196,42 @@ export const Feedback = () => {
                 <span>{feed.question}</span>
               </AccordionTrigger>
 
+              {/* Feedback Content */}
               <AccordionContent className="px-5 py-6 bg-white rounded-b-lg space-y-5 shadow-inner">
+                {/* Rating Display */}
                 <div className="text-lg font-semibold to-gray-700">
                   <Star className="inline mr-2 text-yellow-400" />
                   Rating : {convertToFivePoint(feed.rating)} / 5
                 </div>
 
+                {/* Expected Answer Card */}
                 <Card className="border-none space-y-3 p-4 bg-green-50 rounded-lg shadow-md">
                   <CardTitle className="flex items-center text-lg">
                     <CircleCheck className="mr-2 text-green-600" />
                     Expected Answer
                   </CardTitle>
-
                   <CardDescription className="font-medium text-gray-700">
                     {feed.correct_ans}
                   </CardDescription>
                 </Card>
 
+                {/* User's Answer Card */}
                 <Card className="border-none space-y-3 p-4 bg-yellow-50 rounded-lg shadow-md">
                   <CardTitle className="flex items-center text-lg">
                     <CircleCheck className="mr-2 text-yellow-600" />
                     Your Answer
                   </CardTitle>
-
                   <CardDescription className="font-medium text-gray-700">
                     {feed.user_ans}
                   </CardDescription>
                 </Card>
 
+                {/* Feedback Card */}
                 <Card className="border-none space-y-3 p-4 bg-red-50 rounded-lg shadow-md">
                   <CardTitle className="flex items-center text-lg">
                     <CircleCheck className="mr-2 text-red-600" />
                     Feedback
                   </CardTitle>
-
                   <CardDescription className="font-medium text-gray-700">
                     {feed.feedback}
                   </CardDescription>

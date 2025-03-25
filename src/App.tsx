@@ -1,10 +1,18 @@
+/**
+ * Main Application Component
+ * This file serves as the root component that handles routing and layout structure
+ */
+
+// Import routing dependencies
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+// Import layout components
 import { PublicLayout } from "@/layouts/public-layout";
 import AuthenticationLayout from "@/layouts/auth-layout";
 import ProtectRoutes from "@/layouts/protected-routes";
 import { MainLayout } from "@/layouts/main-layout";
 
+// Import page components
 import HomePage from "@/routes/home";
 import { SignInPage } from "./routes/sign-in";
 import { SignUpPage } from "./routes/sign-up";
@@ -16,11 +24,18 @@ import { MockInterviewPage } from "./routes/mock-interview-page";
 import { Feedback } from "./routes/feedback";
 import { ComingSoon } from "./components/coming-soon";
 
+/**
+ * App Component
+ * Defines the main routing structure of the application with three main sections:
+ * 1. Public routes - Accessible to all users
+ * 2. Authentication routes - For sign in and sign up
+ * 3. Protected routes - Require authentication
+ */
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* public routes */}
+        {/* Public Routes Section - Accessible to all users */}
         <Route element={<PublicLayout />}>
           <Route index element={<HomePage />} />
           <Route path="/contact" element={<ComingSoon />} />
@@ -28,13 +43,13 @@ const App = () => {
           <Route path="/services" element={<ComingSoon />} />
         </Route>
 
-        {/* authentication layout */}
+        {/* Authentication Routes Section - For user login and registration */}
         <Route element={<AuthenticationLayout />}>
           <Route path="/signin/*" element={<SignInPage />} />
           <Route path="/signup/*" element={<SignUpPage />} />
         </Route>
 
-        {/* protected routes */}
+        {/* Protected Routes Section - Require user authentication */}
         <Route
           element={
             <ProtectRoutes>
@@ -42,7 +57,7 @@ const App = () => {
             </ProtectRoutes>
           }
         >
-          {/* add all the protect routes */}
+          {/* Interview Generation and Management Routes */}
           <Route element={<Generate />} path="/generate">
             <Route index element={<Dashboard />} />
             <Route path=":interviewId" element={<CreateEditPage />} />

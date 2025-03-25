@@ -1,3 +1,9 @@
+/**
+ * Custom Breadcrumb Component
+ * Reusable breadcrumb navigation component
+ * Provides consistent navigation hierarchy across the application
+ */
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,11 +15,24 @@ import {
 import { Home } from "lucide-react";
 import React from "react";
 
+/**
+ * Props for the CustomBreadCrumb component
+ * @property breadCrumbPage - Current page title
+ * @property breadCrumpItems - Optional array of navigation items
+ */
 interface CustomBreadCrumbProps {
   breadCrumbPage: string;
   breadCrumpItems?: { link: string; label: string }[];
 }
 
+/**
+ * CustomBreadCrumb Component
+ * Renders a breadcrumb navigation:
+ * - Home link with icon
+ * - Optional intermediate navigation items
+ * - Current page indicator
+ * - Consistent styling and hover effects
+ */
 export const CustomBreadCrumb = ({
   breadCrumbPage,
   breadCrumpItems,
@@ -21,6 +40,7 @@ export const CustomBreadCrumb = ({
   return (
     <Breadcrumb>
       <BreadcrumbList>
+        {/* Home Link */}
         <BreadcrumbItem>
           <BreadcrumbLink
             href="/"
@@ -31,6 +51,7 @@ export const CustomBreadCrumb = ({
           </BreadcrumbLink>
         </BreadcrumbItem>
 
+        {/* Intermediate Navigation Items */}
         {breadCrumpItems &&
           breadCrumpItems.map((item, i) => (
             <React.Fragment key={i}>
@@ -45,6 +66,8 @@ export const CustomBreadCrumb = ({
               </BreadcrumbItem>
             </React.Fragment>
           ))}
+
+        {/* Current Page Indicator */}
         <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbPage>{breadCrumbPage}</BreadcrumbPage>
