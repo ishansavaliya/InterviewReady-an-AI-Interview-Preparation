@@ -12,21 +12,30 @@ import { InterviewPin } from "@/components/pin";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import WebCam from "react-webcam";
 
+// Preparation page for mock interviews
+// Allows users to review interview details and test their webcam before starting
 export const MockLoadPage = () => {
+  // Get interview ID from URL parameters
   const { interviewId } = useParams<{ interviewId: string }>();
+  // State to store the full interview data
   const [interview, setInterview] = useState<Interview | null>(null);
+  // Loading state for data fetching
   const [isLoading, setIsLoading] = useState(false);
+  // Webcam toggle state
   const [isWebCamEnabled, setIsWebCamEnabled] = useState(false);
 
   const navigate = useNavigate();
 
+  // Fetch interview data from Firestore when component mounts
   useEffect(() => {
     setIsLoading(true);
     const fetchInterview = async () => {
       if (interviewId) {
         try {
+          // Get interview document by ID
           const interviewDoc = await getDoc(doc(db, "interviews", interviewId));
           if (interviewDoc.exists()) {
+            // Set interview data with document ID
             setInterview({
               id: interviewDoc.id,
               ...interviewDoc.data(),
@@ -43,26 +52,31 @@ export const MockLoadPage = () => {
     fetchInterview();
   }, [interviewId, navigate]);
 
+  // Show loading spinner while fetching data
   if (isLoading) {
     return <LoaderPage className="w-full h-[70vh]" />;
   }
 
+  // Redirect to interviews list if no ID is provided
   if (!interviewId) {
     navigate("/generate", { replace: true });
   }
 
+  // Redirect to interviews list if the interview wasn't found
   if (!interview) {
     navigate("/generate", { replace: true });
   }
 
   return (
     <div className="flex flex-col w-full gap-8 py-5">
+      {/* Header with breadcrumb and start button */}
       <div className="flex items-center justify-between w-full gap-2">
         <CustomBreadCrumb
           breadCrumbPage={interview?.position || ""}
           breadCrumpItems={[{ label: "Mock Interviews", link: "/generate" }]}
         />
 
+        {/* Button to start the actual interview */}
         <Link to={`/generate/interview/${interviewId}/start`}>
           <Button size={"sm"}>
             Start <Sparkles />
@@ -70,8 +84,10 @@ export const MockLoadPage = () => {
         </Link>
       </div>
 
+      {/* Display interview details card */}
       {interview && <InterviewPin interview={interview} onMockPage />}
 
+      {/* Information alert explaining the process */}
       <Alert className="bg-yellow-100/50 border-yellow-200 p-4 rounded-lg flex items-start gap-3 -mt-3">
         <Lightbulb className="h-5 w-5 text-yellow-600" />
         <div>
@@ -80,7 +96,7 @@ export const MockLoadPage = () => {
           </AlertTitle>
           <AlertDescription className="text-sm text-yellow-700 mt-1">
             Please enable your webcam and microphone to start the AI-generated
-            mock interview. The interview consists of five questions. You’ll
+            mock interview. The interview consists of five questions. You'll
             receive a personalized report based on your responses at the end.{" "}
             <br />
             <br />
@@ -91,6 +107,7 @@ export const MockLoadPage = () => {
         </div>
       </Alert>
 
+      {/* Webcam preview area */}
       <div className="flex items-center justify-center w-full h-full">
         <div className="w-full h-[400px] md:w-96 flex flex-col items-center justify-center border p-4 bg-gray-50 rounded-md">
           {isWebCamEnabled ? (
@@ -105,6 +122,7 @@ export const MockLoadPage = () => {
         </div>
       </div>
 
+      {/* Webcam toggle button */}
       <div className="flex items-center justify-center">
         <Button onClick={() => setIsWebCamEnabled(!isWebCamEnabled)}>
           {isWebCamEnabled ? "Disable Webcam" : "Enable Webcam"}

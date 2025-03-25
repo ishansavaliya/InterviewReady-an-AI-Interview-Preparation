@@ -35,13 +35,30 @@ export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}
 
-// Badge component that renders a small indicator/label
-// Accepts variant prop to change appearance and standard HTML div attributes
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  );
+// Create a separate utility to get badge variant class names
+function getBadgeVariantClasses(
+  variant?: VariantProps<typeof badgeVariants>["variant"],
+  className?: string
+) {
+  return cn(badgeVariants({ variant }), className);
 }
 
-// Export the Badge component and its variants for use in other files
-export { Badge, badgeVariants };
+// Badge component that renders a small indicator/label
+// Accepts variant prop to change appearance and standard HTML div attributes
+const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
+  ({ className, variant, ...props }, ref) => {
+    return (
+      <div
+        className={getBadgeVariantClasses(variant, className)}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+Badge.displayName = "Badge";
+
+// Export the Badge component as the default export to help with Fast Refresh
+export default Badge;
+// Re-export the badge variants for use elsewhere
+export { badgeVariants };

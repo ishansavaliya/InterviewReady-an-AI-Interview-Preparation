@@ -32,10 +32,13 @@ import {
 } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 
+// Component props interface - can receive initial interview data for editing mode
 interface FormMockInterviewProps {
   initialData: Interview | null;
 }
 
+// Zod schema for form validation
+// Defines validation rules for all form fields
 const formSchema = z.object({
   position: z
     .string()
@@ -48,19 +51,23 @@ const formSchema = z.object({
   techStack: z.string().min(1, "Tech stack must be at least a character"),
 });
 
+// TypeScript type derived from the Zod schema
 type FormData = z.infer<typeof formSchema>;
 
 export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
+  // Initialize form with react-hook-form and zod validation
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {},
   });
 
+  // Extract form state for conditional rendering
   const { isValid, isSubmitting } = form.formState;
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { userId } = useAuth();
 
+  // Dynamic text based on whether we're creating or editing
   const title = initialData
     ? initialData.position
     : "Create a new mock interview";
@@ -71,6 +78,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     ? { title: "Updated..!", description: "Changes saved successfully..." }
     : { title: "Created..!", description: "New Mock Interview created..." };
 
+  // Helper function to clean AI response text and extract JSON data
   const cleanAiResponse = (responseText: string) => {
     // Step 1: Trim any surrounding whitespace
     let cleanText = responseText.trim();
@@ -94,7 +102,9 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     }
   };
 
+  // Function to generate interview questions using AI based on form data
   const generateAiResponse = async (data: FormData) => {
+    // Construct a prompt that instructs the AI to generate interview questions
     const prompt = `
         As an experienced prompt engineer, generate a JSON array containing 5 technical interview questions along with detailed answers based on the following job information. Each object in the array should have the fields "question" and "answer", formatted as follows:
 
@@ -112,18 +122,20 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
         The questions should assess skills in ${data?.techStack} development and best practices, problem-solving, and experience handling complex requirements. Please format the output strictly as an array of JSON objects without any additional labels, code blocks, or explanations. Return only the JSON array with questions and answers.
         `;
 
+    // Send the prompt to the AI and get the response
     const aiResult = await chatSession.sendMessage(prompt);
     const cleanedResponse = cleanAiResponse(aiResult.response.text());
 
     return cleanedResponse;
   };
 
+  // Form submission handler
   const onSubmit = async (data: FormData) => {
     try {
       setLoading(true);
 
       if (initialData) {
-        // update
+        // Update existing interview document
         if (isValid) {
           const aiResult = await generateAiResponse(data);
 
@@ -135,7 +147,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
           toast(toastMessage.title, { description: toastMessage.description });
         }
       } else {
-        // create a new mock interview
+        // Create a new interview document
         if (isValid) {
           const aiResult = await generateAiResponse(data);
 
@@ -150,6 +162,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
         }
       }
 
+      // Navigate back to the interviews list page
       navigate("/generate", { replace: true });
     } catch (error) {
       console.log(error);
@@ -161,6 +174,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
     }
   };
 
+  // Populate form with existing data when editing
   useEffect(() => {
     if (initialData) {
       form.reset({
@@ -174,11 +188,13 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
 
   return (
     <div className="w-full flex-col space-y-4">
+      {/* Breadcrumb navigation */}
       <CustomBreadCrumb
         breadCrumbPage={breadCrumpPage}
         breadCrumpItems={[{ label: "Mock Interviews", link: "/generate" }]}
       />
 
+      {/* Header with title and optional delete button */}
       <div className="mt-4 flex items-center justify-between w-full">
         <Headings title={title} isSubHeading />
 
@@ -193,11 +209,13 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
 
       <div className="my-6"></div>
 
+      {/* Form with validation */}
       <FormProvider {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full p-8 rounded-lg flex-col flex items-start justify-start gap-6 shadow-md "
         >
+          {/* Job Position field */}
           <FormField
             control={form.control}
             name="position"
@@ -220,6 +238,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
             )}
           />
 
+          {/* Job Description field */}
           <FormField
             control={form.control}
             name="description"
@@ -242,6 +261,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
             )}
           />
 
+          {/* Years of Experience field */}
           <FormField
             control={form.control}
             name="experience"
@@ -265,6 +285,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
             )}
           />
 
+          {/* Tech Stack field */}
           <FormField
             control={form.control}
             name="techStack"
@@ -287,6 +308,7 @@ export const FormMockInterview = ({ initialData }: FormMockInterviewProps) => {
             )}
           />
 
+          {/* Form action buttons */}
           <div className="w-full flex items-center justify-end gap-6">
             <Button
               type="reset"

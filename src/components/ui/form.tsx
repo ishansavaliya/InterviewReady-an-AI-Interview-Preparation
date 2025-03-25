@@ -1,3 +1,9 @@
+/**
+ * Form Components
+ * Form handling components built on React Hook Form and Radix UI
+ * Provides accessible form controls with validation and error handling
+ */
+
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
@@ -13,11 +19,16 @@ import {
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
-// Alias for FormProvider from react-hook-form for consistency
+/**
+ * Form Provider Component
+ * Wraps form components with React Hook Form context
+ */
 const Form = FormProvider;
 
-// Type definition for the form field context
-// Tracks the name of the field for connecting with react-hook-form
+/**
+ * Form Field Context Type
+ * Defines the context value type for form fields
+ */
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -25,13 +36,19 @@ type FormFieldContextValue<
   name: TName;
 };
 
-// Context to pass form field information down the component tree
+/**
+ * Form Field Context
+ * React context for form field state
+ */
 const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue
 );
 
-// Wrapper for react-hook-form's Controller component
-// Creates a context provider for form field information
+/**
+ * Form Field Component
+ * Wraps form controls with field context
+ * Integrates with React Hook Form's Controller
+ */
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -45,8 +62,11 @@ const FormField = <
   );
 };
 
-// Custom hook that provides field state and accessibility attributes
-// Combines form context with field context to create a complete picture of a field's state
+/**
+ * useFormField Hook
+ * Custom hook for accessing form field state and context
+ * Provides field IDs and error states
+ */
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -70,19 +90,27 @@ const useFormField = () => {
   };
 };
 
-// Type definition for form item context
-// Provides a unique ID for connecting form elements
+/**
+ * Form Item Context Type
+ * Defines the context value type for form items
+ */
 type FormItemContextValue = {
   id: string;
 };
 
-// Context to pass form item information down the component tree
+/**
+ * Form Item Context
+ * React context for form item state
+ */
 const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue
 );
 
-// Container component for form field, label, and associated elements
-// Generates a unique ID and provides it via context
+/**
+ * Form Item Component
+ * Container for form field elements
+ * Provides consistent spacing and layout
+ */
 const FormItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -97,8 +125,11 @@ const FormItem = React.forwardRef<
 });
 FormItem.displayName = "FormItem";
 
-// Label component for form fields
-// Automatically connects to its field and shows error state
+/**
+ * Form Label Component
+ * Label element for form controls
+ * Integrates with form field state for error handling
+ */
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
@@ -116,8 +147,11 @@ const FormLabel = React.forwardRef<
 });
 FormLabel.displayName = "FormLabel";
 
-// Wrapper for form input controls (inputs, selects, etc.)
-// Adds accessibility attributes based on field state
+/**
+ * Form Control Component
+ * Wrapper for form input elements
+ * Handles accessibility attributes and error states
+ */
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
@@ -141,8 +175,11 @@ const FormControl = React.forwardRef<
 });
 FormControl.displayName = "FormControl";
 
-// Helper text component that appears below a form field
-// Connected to the field via ID for accessibility
+/**
+ * Form Description Component
+ * Helper text for form fields
+ * Provides additional context for users
+ */
 const FormDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -160,8 +197,11 @@ const FormDescription = React.forwardRef<
 });
 FormDescription.displayName = "FormDescription";
 
-// Error message component for form validation errors
-// Automatically displays field errors from react-hook-form
+/**
+ * Form Message Component
+ * Error message display for form fields
+ * Shows validation errors and custom messages
+ */
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
@@ -186,7 +226,6 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
-// Export all form components and hooks for use in other files
 export {
   useFormField,
   Form,

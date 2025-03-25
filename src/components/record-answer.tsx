@@ -28,46 +28,56 @@ import {
 } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 
+// Component props interface
 interface RecordAnswerProps {
-  question: { question: string; answer: string };
-  isWebCam: boolean;
-  setIsWebCam: (value: boolean) => void;
+  question: { question: string; answer: string }; // Current question and expected answer
+  isWebCam: boolean; // State to control webcam visibility
+  setIsWebCam: (value: boolean) => void; // Function to toggle webcam
 }
 
+// Interface for AI feedback response structure
 interface AIResponse {
-  ratings: number;
-  feedback: string;
+  ratings: number; // Rating score from 1-10
+  feedback: string; // Detailed feedback text
 }
 
+// Component for recording user's answer to an interview question
+// Handles speech-to-text, webcam, AI feedback, and saving responses
 export const RecordAnswer = ({
   question,
   isWebCam,
   setIsWebCam,
 }: RecordAnswerProps) => {
+  // Set up speech-to-text functionality
   const {
-    interimResult,
-    isRecording,
-    results,
-    startSpeechToText,
-    stopSpeechToText,
+    interimResult, // Current word being transcribed
+    isRecording, // Whether recording is active
+    results, // Final transcription results
+    startSpeechToText, // Start recording function
+    stopSpeechToText, // Stop recording function
   } = useSpeechToText({
-    continuous: true,
-    useLegacyResults: false,
+    continuous: true, // Keep recording until manually stopped
+    useLegacyResults: false, // Use modern browser APIs
   });
 
-  const [userAnswer, setUserAnswer] = useState("");
-  const [isAiGenerating, setIsAiGenerating] = useState(false);
-  const [aiResult, setAiResult] = useState<AIResponse | null>(null);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // Local state management
+  const [userAnswer, setUserAnswer] = useState(""); // Combined transcription
+  const [isAiGenerating, setIsAiGenerating] = useState(false); // Loading state for AI
+  const [aiResult, setAiResult] = useState<AIResponse | null>(null); // AI feedback
+  const [open, setOpen] = useState(false); // Control save confirmation modal
+  const [loading, setLoading] = useState(false); // Loading state for save operation
 
+  // Get user ID for database operations
   const { userId } = useAuth();
+  // Get interview ID from URL parameters
   const { interviewId } = useParams();
 
+  // Toggle recording and generate AI feedback when stopped
   const recordUserAnswer = async () => {
     if (isRecording) {
       stopSpeechToText();
 
+      // Validate answer length
       if (userAnswer?.length < 30) {
         toast.error("Error", {
           description: "Your answer should be more than 30 characters",
@@ -76,7 +86,7 @@ export const RecordAnswer = ({
         return;
       }
 
-      //   ai result
+      // Generate AI feedback by comparing user's answer to the expected answer
       const aiResult = await generateResult(
         question.question,
         question.answer,
@@ -89,6 +99,7 @@ export const RecordAnswer = ({
     }
   };
 
+  // Helper function to clean and parse AI JSON response
   const cleanJsonResponse = (responseText: string) => {
     // Step 1: Trim any surrounding whitespace
     let cleanText = responseText.trim();
@@ -104,12 +115,14 @@ export const RecordAnswer = ({
     }
   };
 
+  // Generate AI feedback by comparing user's answer to expected answer
   const generateResult = async (
     qst: string,
     qstAns: string,
     userAns: string
   ): Promise<AIResponse> => {
     setIsAiGenerating(true);
+    // Create prompt for AI to evaluate the answer
     const prompt = `
       Question: "${qst}"
       User Answer: "${userAns}"
@@ -119,8 +132,10 @@ export const RecordAnswer = ({
     `;
 
     try {
+      // Send prompt to AI service
       const aiResult = await chatSession.sendMessage(prompt);
 
+      // Parse and clean the AI response
       const parsedResult: AIResponse = cleanJsonResponse(
         aiResult.response.text()
       );
@@ -136,12 +151,14 @@ export const RecordAnswer = ({
     }
   };
 
+  // Reset and restart recording
   const recordNewAnswer = () => {
     setUserAnswer("");
     stopSpeechToText();
     startSpeechToText();
   };
 
+  // Save user's answer and AI feedback to Firestore
   const saveUserAnswer = async () => {
     setLoading(true);
 
@@ -151,8 +168,7 @@ export const RecordAnswer = ({
 
     const currentQuestion = question.question;
     try {
-      // query the firbase to check if the user answer already exists for this question
-
+      // Check if the user has already answered this question
       const userAnswerQuery = query(
         collection(db, "userAnswers"),
         where("userId", "==", userId),
@@ -161,7 +177,7 @@ export const RecordAnswer = ({
 
       const querySnap = await getDocs(userAnswerQuery);
 
-      // if the user already answerd the question dont save it again
+      // If the user already answered the question, don't save it again
       if (!querySnap.empty) {
         console.log("Query Snap Size", querySnap.size);
         toast.info("Already Answered", {
@@ -169,8 +185,7 @@ export const RecordAnswer = ({
         });
         return;
       } else {
-        // save the user answer
-
+        // Save the user's answer and AI feedback to Firestore
         await addDoc(collection(db, "userAnswers"), {
           mockIdRef: interviewId,
           question: question.question,
@@ -185,6 +200,7 @@ export const RecordAnswer = ({
         toast("Saved", { description: "Your answer has been saved.." });
       }
 
+      // Reset after saving
       setUserAnswer("");
       stopSpeechToText();
     } catch (error) {
@@ -198,6 +214,7 @@ export const RecordAnswer = ({
     }
   };
 
+  // Combine all speech-to-text results into a single string
   useEffect(() => {
     const combineTranscripts = results
       .filter((result): result is ResultType => typeof result !== "string")
@@ -209,7 +226,7 @@ export const RecordAnswer = ({
 
   return (
     <div className="w-full flex flex-col items-center gap-8 mt-4">
-      {/* save modal */}
+      {/* Confirmation modal for saving answers */}
       <SaveModal
         isOpen={open}
         onClose={() => setOpen(false)}
@@ -217,6 +234,7 @@ export const RecordAnswer = ({
         loading={loading}
       />
 
+      {/* Webcam display area */}
       <div className="w-full h-[400px] md:w-96 flex flex-col items-center justify-center border p-4 bg-gray-50 rounded-md">
         {isWebCam ? (
           <WebCam
@@ -229,7 +247,9 @@ export const RecordAnswer = ({
         )}
       </div>
 
+      {/* Control buttons for recording and webcam */}
       <div className="flex itece justify-center gap-3">
+        {/* Toggle webcam button */}
         <TooltipButton
           content={isWebCam ? "Turn Off" : "Turn On"}
           icon={
@@ -242,6 +262,7 @@ export const RecordAnswer = ({
           onClick={() => setIsWebCam(!isWebCam)}
         />
 
+        {/* Start/stop recording button */}
         <TooltipButton
           content={isRecording ? "Stop Recording" : "Start Recording"}
           icon={
@@ -254,12 +275,14 @@ export const RecordAnswer = ({
           onClick={recordUserAnswer}
         />
 
+        {/* Reset and record again button */}
         <TooltipButton
           content="Record Again"
           icon={<RefreshCw className="min-w-5 min-h-5" />}
           onClick={recordNewAnswer}
         />
 
+        {/* Save results button with loading state */}
         <TooltipButton
           content="Save Result"
           icon={
@@ -270,17 +293,20 @@ export const RecordAnswer = ({
             )
           }
           onClick={() => setOpen(!open)}
-          disbaled={!aiResult}
+          disbaled={!aiResult} // Disabled until AI feedback is available
         />
       </div>
 
+      {/* Display area for transcribed answer */}
       <div className="w-full mt-4 p-4 border rounded-md bg-gray-50">
         <h2 className="text-lg font-semibold">Your Answer:</h2>
 
+        {/* Show user's answer or placeholder text */}
         <p className="text-sm mt-2 text-gray-700 whitespace-normal">
           {userAnswer || "Start recording to see your answer here :- "}
         </p>
 
+        {/* Show interim results (words being currently transcribed) */}
         {interimResult && (
           <p className="text-sm text-gray-500 mt-2">
             <strong>Current Speech:</strong>

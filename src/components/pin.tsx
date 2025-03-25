@@ -6,16 +6,19 @@ import {
   CardFooter,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "./ui/badge";
+import Badge from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { TooltipButton } from "./tooltip-button";
 import { Eye, Newspaper, Sparkles } from "lucide-react";
 
+// Component props interface
+// Receives interview data and an optional flag to indicate context
 interface InterviewPinProps {
   interview: Interview;
-  onMockPage?: boolean;
+  onMockPage?: boolean; // Controls display of action buttons
 }
 
+// Card component that displays an interview summary with action buttons
 export const InterviewPin = ({
   interview,
   onMockPage = false,
@@ -24,8 +27,13 @@ export const InterviewPin = ({
 
   return (
     <Card className="p-4 rounded-md shadow-none hover:shadow-md shadow-gray-100 cursor-pointer transition-all space-y-4">
+      {/* Job position as card title */}
       <CardTitle className="text-lg">{interview?.position}</CardTitle>
+
+      {/* Job description */}
       <CardDescription>{interview?.description}</CardDescription>
+
+      {/* Tech stack tags displayed as badges */}
       <div className="w-full flex items-center gap-2 flex-wrap">
         {interview?.techStack.split(",").map((word, index) => (
           <Badge
@@ -38,12 +46,14 @@ export const InterviewPin = ({
         ))}
       </div>
 
+      {/* Card footer with timestamp and action buttons */}
       <CardFooter
         className={cn(
           "w-full flex items-center p-0",
-          onMockPage ? "justify-end" : "justify-between"
+          onMockPage ? "justify-end" : "justify-between" // Conditional layout based on context
         )}
       >
+        {/* Formatted creation timestamp */}
         <p className="text-[12px] text-muted-foreground truncate whitespace-nowrap">
           {`${new Date(interview?.createdAt.toDate()).toLocaleDateString(
             "en-US",
@@ -54,8 +64,10 @@ export const InterviewPin = ({
           )}`}
         </p>
 
+        {/* Action buttons - only shown when not on mock page */}
         {!onMockPage && (
           <div className="flex items-center justify-center">
+            {/* View interview details button */}
             <TooltipButton
               content="View"
               buttonVariant={"ghost"}
@@ -68,6 +80,7 @@ export const InterviewPin = ({
               loading={false}
             />
 
+            {/* View feedback button */}
             <TooltipButton
               content="Feedback"
               buttonVariant={"ghost"}
@@ -82,6 +95,7 @@ export const InterviewPin = ({
               loading={false}
             />
 
+            {/* Start interview button */}
             <TooltipButton
               content="Start"
               buttonVariant={"ghost"}
