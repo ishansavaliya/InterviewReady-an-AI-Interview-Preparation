@@ -62,7 +62,7 @@ InterviewReady is an AI-driven platform designed to help users prepare for job i
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/ishansavaliya/InterviewReady.git
+   git clone https://github.com/ishansavaliya/InterviewReady-an-AI-Interview-Preparation.git
    ```
 
 2. **Navigate to the project directory:**
