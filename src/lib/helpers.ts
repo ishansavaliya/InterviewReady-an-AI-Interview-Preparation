@@ -14,12 +14,16 @@ export const MainRoutes = [
     href: "/", // URL path for home page
   },
   {
-    label: "Contact Us", // Display label for contact page
-    href: "/contact", // URL path for contact page
+    label: "Take An Interview", // Display label for interview page
+    href: "/generate", // URL path for interview page
   },
   {
-    label: "About Us", // Display label for about page
-    href: "/about", // URL path for about page
+    label: "Resume Builder", // Display label for resume builder
+    href: "/resume", // URL path for resume builder
+  },
+  {
+    label: "AI Chatbot", // Display label for AI chatbot
+    href: "/chatbot", // URL path for AI chatbot
   },
   {
     label: "Services", // Display label for services page

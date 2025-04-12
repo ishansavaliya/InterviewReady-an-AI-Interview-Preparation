@@ -44,21 +44,6 @@ export const ToggleContainer = () => {
         <nav className="gap-6 flex flex-col items-start">
           {/* Main Navigation Routes */}
           <NavigationRoutes isMobile />
-
-          {/* Interview Link (Authenticated Users Only) */}
-          {userId && (
-            <NavLink
-              to={"/generate"}
-              className={({ isActive }) =>
-                cn(
-                  "text-base text-neutral-600 ",
-                  isActive && "text-neutral-900 font-semibold"
-                )
-              }
-            >
-              Take An Interview
-            </NavLink>
-          )}
         </nav>
       </SheetContent>
     </Sheet>

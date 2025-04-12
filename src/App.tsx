@@ -23,6 +23,8 @@ import { MockLoadPage } from "./routes/mock-load-page";
 import { MockInterviewPage } from "./routes/mock-interview-page";
 import { Feedback } from "./routes/feedback";
 import { ComingSoon } from "./components/coming-soon";
+import { ResumeBuilder } from "./resume/ResumeBuilder";
+import Services from "./routes/services";
 
 /**
  * App Component
@@ -38,9 +40,9 @@ const App = () => {
         {/* Public Routes Section - Accessible to all users */}
         <Route element={<PublicLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/contact" element={<ComingSoon />} />
-          <Route path="/about" element={<ComingSoon />} />
-          <Route path="/services" element={<ComingSoon />} />
+          <Route path="/resume" element={<ResumeBuilder />} />
+          <Route path="/chatbot" element={<ComingSoon />} />
+          <Route path="/services" element={<Services />} />
         </Route>
 
         {/* Authentication Routes Section - For user login and registration */}

@@ -72,3 +72,32 @@
       /* Bottom-left */ 1px 1px 0 rgba(0, 0, 0, 0.6); /* Bottom-right */
   }
 }
+
+/* Print styles */
+@media print {
+  /* Hide everything except the resume preview */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Show only the resume preview */
+  .bg-gray-50[ref="resumePreviewRef"],
+  .bg-gray-50[ref="resumePreviewRef"] * {
+    visibility: visible !important;
+  }
+
+  /* Position the resume for optimal printing */
+  .bg-gray-50[ref="resumePreviewRef"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding: 2rem !important;
+    margin: 0 !important;
+    background-color: white !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
