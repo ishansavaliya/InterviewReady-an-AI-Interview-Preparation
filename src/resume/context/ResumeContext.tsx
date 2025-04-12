@@ -3,7 +3,13 @@
  * Provides state management for resume data across all builder components
  */
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 // Resume template options
 export enum ResumeTemplate {
@@ -189,7 +195,37 @@ export const ResumeContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [resumeData, setResumeData] = useState<ResumeData>(defaultResumeData);
+  // Initialize state from localStorage if available, otherwise use default
+  const [resumeData, setResumeData] = useState<ResumeData>(() => {
+    const savedData = localStorage.getItem("resumeData");
+    if (savedData) {
+      try {
+        return JSON.parse(savedData);
+      } catch (e) {
+        console.error("Error parsing saved resume data:", e);
+        return defaultResumeData;
+      }
+    }
+    return defaultResumeData;
+  });
+
+  // Save to localStorage whenever resumeData changes
+  useEffect(() => {
+    localStorage.setItem("resumeData", JSON.stringify(resumeData));
+    console.log(
+      "ResumeData state updated and saved to localStorage:",
+      resumeData
+    );
+    console.log("Projects count:", resumeData.projects.length);
+    console.log("Certificates count:", resumeData.certificates.length);
+  }, [resumeData]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log("ResumeData state updated:", resumeData);
+    console.log("Projects count:", resumeData.projects.length);
+    console.log("Certificates count:", resumeData.certificates.length);
+  }, [resumeData]);
 
   // Template method
   const updateTemplate = (template: ResumeTemplate) => {
@@ -292,22 +328,32 @@ export const ResumeContextProvider = ({
 
   // Projects methods
   const addProject = (item: Omit<ResumeData["projects"][0], "id">) => {
-    setResumeData((prev) => ({
-      ...prev,
-      projects: [...prev.projects, { ...item, id: generateId() }],
-    }));
+    console.log("ResumeContext - Adding project:", item);
+    setResumeData((prev) => {
+      const updated = {
+        ...prev,
+        projects: [...prev.projects, { ...item, id: generateId() }],
+      };
+      console.log("ResumeContext - Updated projects:", updated.projects);
+      return updated;
+    });
   };
 
   const updateProject = (
     id: string,
     data: Partial<Omit<ResumeData["projects"][0], "id">>
   ) => {
-    setResumeData((prev) => ({
-      ...prev,
-      projects: prev.projects.map((item) =>
-        item.id === id ? { ...item, ...data } : item
-      ),
-    }));
+    console.log(`ResumeContext - Updating project ${id}:`, data);
+    setResumeData((prev) => {
+      const updated = {
+        ...prev,
+        projects: prev.projects.map((item) =>
+          item.id === id ? { ...item, ...data } : item
+        ),
+      };
+      console.log("ResumeContext - Updated projects:", updated.projects);
+      return updated;
+    });
   };
 
   const removeProject = (id: string) => {
@@ -373,22 +419,38 @@ export const ResumeContextProvider = ({
 
   // Certificates methods
   const addCertificate = (item: Omit<ResumeData["certificates"][0], "id">) => {
-    setResumeData((prev) => ({
-      ...prev,
-      certificates: [...prev.certificates, { ...item, id: generateId() }],
-    }));
+    console.log("ResumeContext - Adding certificate:", item);
+    setResumeData((prev) => {
+      const updated = {
+        ...prev,
+        certificates: [...prev.certificates, { ...item, id: generateId() }],
+      };
+      console.log(
+        "ResumeContext - Updated certificates:",
+        updated.certificates
+      );
+      return updated;
+    });
   };
 
   const updateCertificate = (
     id: string,
     data: Partial<Omit<ResumeData["certificates"][0], "id">>
   ) => {
-    setResumeData((prev) => ({
-      ...prev,
-      certificates: prev.certificates.map((item) =>
-        item.id === id ? { ...item, ...data } : item
-      ),
-    }));
+    console.log(`ResumeContext - Updating certificate ${id}:`, data);
+    setResumeData((prev) => {
+      const updated = {
+        ...prev,
+        certificates: prev.certificates.map((item) =>
+          item.id === id ? { ...item, ...data } : item
+        ),
+      };
+      console.log(
+        "ResumeContext - Updated certificates:",
+        updated.certificates
+      );
+      return updated;
+    });
   };
 
   const removeCertificate = (id: string) => {

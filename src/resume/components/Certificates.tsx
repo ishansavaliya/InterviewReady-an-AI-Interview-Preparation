@@ -38,7 +38,46 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
 
   // Add a new certificate
   const handleAddCertificate = () => {
-    addCertificate(newEntry);
+    // Validate that required fields are filled
+    if (!newEntry.name.trim()) {
+      alert("Please enter a certificate name");
+      return;
+    }
+
+    // Create a certificate object with ID
+    const newCertificate = {
+      ...newEntry,
+      id: Math.random().toString(36).substring(2, 9),
+    };
+
+    // Add to context
+    addCertificate(newCertificate);
+
+    // Also directly update localStorage to ensure it's saved immediately
+    try {
+      const savedData = localStorage.getItem("resumeData");
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        parsedData.certificates = [
+          ...(parsedData.certificates || []),
+          newCertificate,
+        ];
+        localStorage.setItem("resumeData", JSON.stringify(parsedData));
+        console.log(
+          "Certificate added directly to localStorage:",
+          newCertificate
+        );
+        alert(
+          "Certificate added successfully! Click the Refresh button in the preview to see it."
+        );
+      }
+    } catch (e) {
+      console.error("Error updating localStorage:", e);
+      alert(
+        "Certificate added, but there was an issue saving it. Please try refreshing the page."
+      );
+    }
+
     setNewEntry(emptyCertificate);
     setEditing(false);
   };
@@ -49,6 +88,7 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
     field: string,
     value: string
   ) => {
+    console.log(`Updating certificate ${id}, field: ${field}, value: ${value}`);
     updateCertificate(id, { [field]: value });
   };
 
@@ -233,8 +273,14 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
         <Button
           type="button"
           onClick={() => {
-            // Show success message
-            alert("Resume completed! You can now download it as PDF or DOCX.");
+            // Show detailed success message
+            console.log("Resume completed with data:", resumeData);
+            alert(`Resume completed! 
+              You have added:
+              - ${resumeData.projects.length} projects
+              - ${resumeData.certificates.length} certificates
+              
+              You can now download your resume as PDF or DOCX.`);
           }}
           className="bg-emerald-500 hover:bg-emerald-600 text-white"
         >

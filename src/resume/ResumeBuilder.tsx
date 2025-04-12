@@ -3,7 +3,7 @@
  * Main component for building and exporting resumes
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Container } from "@/components/container";
 import { PersonalInfo } from "./components/PersonalInfo";
 import { WorkExperience } from "../resume/components/WorkExperience";
@@ -66,6 +66,19 @@ const ResumeBuilderContent = () => {
   );
   const resumePreviewRef = useRef<HTMLDivElement>(null);
   const { resumeData } = useResumeContext();
+
+  // Monitor changes to resumeData
+  useEffect(() => {
+    console.log("ResumeBuilderContent: resumeData updated");
+    console.log(
+      "ResumeBuilderContent: projects count",
+      resumeData.projects.length
+    );
+    console.log(
+      "ResumeBuilderContent: certificates count",
+      resumeData.certificates.length
+    );
+  }, [resumeData]);
 
   // Handle step navigation
   const goToStep = (step: BuilderStep) => setCurrentStep(step);
@@ -594,6 +607,47 @@ const ResumeBuilderContent = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">Preview</h2>
               <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex items-center gap-1"
+                  onClick={() => {
+                    // Force refresh from localStorage
+                    const savedData = localStorage.getItem("resumeData");
+                    if (savedData) {
+                      try {
+                        const parsedData = JSON.parse(savedData);
+                        console.log(
+                          "Refreshing preview with localStorage data:",
+                          parsedData
+                        );
+                        // This will trigger a re-render
+                        window.location.reload();
+                      } catch (e) {
+                        console.error("Error refreshing data:", e);
+                      }
+                    }
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-refresh-cw"
+                  >
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                    <path d="M21 3v5h-5" />
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                    <path d="M3 21v-5h5" />
+                  </svg>
+                  <span>Refresh</span>
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"

@@ -20,9 +20,52 @@ import {
   Code,
   ExternalLink,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const ResumePreview = () => {
-  const { resumeData } = useResumeContext();
+  console.log("ResumePreview rendering");
+
+  // Get data from context first
+  const { resumeData: contextData } = useResumeContext();
+
+  // Use state to potentially override with localStorage data
+  const [localData, setLocalData] = useState(contextData);
+
+  // Check localStorage for resume data and use it if needed
+  useEffect(() => {
+    const savedData = localStorage.getItem("resumeData");
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+
+        // If projects or certificates is empty in context but exists in localStorage
+        if (
+          (contextData.projects.length === 0 &&
+            parsedData.projects &&
+            parsedData.projects.length > 0) ||
+          (contextData.certificates.length === 0 &&
+            parsedData.certificates &&
+            parsedData.certificates.length > 0)
+        ) {
+          // Use localStorage data to supplement the context data
+          setLocalData({
+            ...contextData,
+            projects:
+              parsedData.projects && parsedData.projects.length > 0
+                ? parsedData.projects
+                : contextData.projects,
+            certificates:
+              parsedData.certificates && parsedData.certificates.length > 0
+                ? parsedData.certificates
+                : contextData.certificates,
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing localStorage in preview:", e);
+      }
+    }
+  }, [contextData]);
+
   const {
     template,
     personalInfo,
@@ -32,7 +75,11 @@ export const ResumePreview = () => {
     projects,
     education,
     certificates,
-  } = resumeData;
+  } = localData;
+
+  // Add console logs to debug projects and certificates
+  console.log("ResumePreview projects:", projects);
+  console.log("ResumePreview certificates:", certificates);
 
   // Format date for display
   const formatDate = (dateString: string) => {
