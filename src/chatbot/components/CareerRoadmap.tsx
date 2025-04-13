@@ -477,19 +477,10 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({
                 "prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4",
                 "prose-h1:pb-3 prose-h1:border-b prose-h1:border-purple-200",
                 "prose-h2:pb-2 prose-h2:border-b prose-h2:border-purple-100",
-                "prose-ul:pl-6 prose-ol:pl-6",
-                "prose-li:mb-6 prose-li:pb-3",
-                "prose-li:marker:text-purple-500",
                 "prose-strong:font-bold prose-strong:text-purple-800",
                 "prose-p:my-5 prose-a:text-blue-600 prose-a:hover:underline",
                 "[&>*:first-child]:mt-0",
-                "prose-li:mt-3",
-                "[&>ul>li]:mb-6 [&>ol>li]:mb-6",
-                "[&>ul]:space-y-5 [&>ol]:space-y-5",
-                "[&>h2:last-of-type+ul>li]:mb-8 [&>h2:last-of-type+ul]:space-y-8",
-                "prose-li:block",
-                "text-[16px] leading-relaxed tracking-wide",
-                "[&>ul>li>.absolute]:top-1" // Fix bullet alignment for phase headers
+                "text-[16px] leading-relaxed tracking-wide"
               )}
             >
               <ReactMarkdown
@@ -556,15 +547,18 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({
                       return (
                         <li
                           {...props}
-                          className="mb-8 mt-4 pb-4 block w-full hover:bg-purple-50/50 transition-all duration-200 rounded-md pl-2 relative"
-                          style={{ counterIncrement: "step-counter" }}
+                          className="mb-8 mt-4 pb-4 block w-full hover:bg-purple-50/50 transition-all duration-200 rounded-md pl-2"
                         >
-                          <div className="absolute -left-10 top-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                            <span className="text-purple-800 font-bold text-sm">
-                              {orderListCounter}
-                            </span>
+                          <div className="flex items-start">
+                            <div className="min-w-[28px] mr-3">
+                              <div className="w-7 h-7 bg-purple-100 rounded-full flex items-center justify-center">
+                                <span className="text-purple-800 font-bold text-sm">
+                                  {orderListCounter}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex-1">{children}</div>
                           </div>
-                          <div className="ml-1">{children}</div>
                         </li>
                       );
                     }
@@ -577,19 +571,19 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({
                           isPhaseHeader ? "phase-header" : ""
                         }`}
                       >
-                        <div
-                          className={`absolute -left-6 ${
-                            isPhaseHeader ? "top-1" : "top-1.5"
-                          } w-3 h-3 bg-purple-500 rounded-full`}
-                        ></div>
-                        <div className="ml-1 pt-0.5">{children}</div>
+                        <div className="flex items-start">
+                          <div className="min-w-[10px] h-3 mt-6 mr-3">
+                            <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                          </div>
+                          <div>{children}</div>
+                        </div>
                       </li>
                     );
                   },
                   ul: ({ node, children, ...props }) => (
                     <ul
                       {...props}
-                      className="my-5 space-y-3 pl-8 flex flex-col relative"
+                      className="my-5 space-y-3 flex flex-col list-none"
                     >
                       {children}
                     </ul>
@@ -601,7 +595,7 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({
                     return (
                       <ol
                         {...props}
-                        className="my-6 space-y-6 pl-12 flex flex-col list-none"
+                        className="my-6 space-y-6 flex flex-col list-none"
                         style={{ counterReset: "step-counter" }}
                         data-is-ordered-list="true"
                       >
