@@ -1,6 +1,5 @@
 /**
- * ResumePreview Component
- * Displays a live preview of the resume being built
+ * ResumePreview Component - Improved for better PDF rendering
  */
 
 import { useResumeContext, ResumeTemplate } from "../context/ResumeContext";
@@ -15,56 +14,14 @@ import {
   Linkedin,
   Globe,
   Link,
-  Briefcase,
   Award,
   Code,
   ExternalLink,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export const ResumePreview = () => {
-  console.log("ResumePreview rendering");
-
-  // Get data from context first
-  const { resumeData: contextData } = useResumeContext();
-
-  // Use state to potentially override with localStorage data
-  const [localData, setLocalData] = useState(contextData);
-
-  // Check localStorage for resume data and use it if needed
-  useEffect(() => {
-    const savedData = localStorage.getItem("resumeData");
-    if (savedData) {
-      try {
-        const parsedData = JSON.parse(savedData);
-
-        // If projects or certificates is empty in context but exists in localStorage
-        if (
-          (contextData.projects.length === 0 &&
-            parsedData.projects &&
-            parsedData.projects.length > 0) ||
-          (contextData.certificates.length === 0 &&
-            parsedData.certificates &&
-            parsedData.certificates.length > 0)
-        ) {
-          // Use localStorage data to supplement the context data
-          setLocalData({
-            ...contextData,
-            projects:
-              parsedData.projects && parsedData.projects.length > 0
-                ? parsedData.projects
-                : contextData.projects,
-            certificates:
-              parsedData.certificates && parsedData.certificates.length > 0
-                ? parsedData.certificates
-                : contextData.certificates,
-          });
-        }
-      } catch (e) {
-        console.error("Error parsing localStorage in preview:", e);
-      }
-    }
-  }, [contextData]);
+  // Get data directly from context
+  const { resumeData } = useResumeContext();
 
   const {
     template,
@@ -75,11 +32,7 @@ export const ResumePreview = () => {
     projects,
     education,
     certificates,
-  } = localData;
-
-  // Add console logs to debug projects and certificates
-  console.log("ResumePreview projects:", projects);
-  console.log("ResumePreview certificates:", certificates);
+  } = resumeData;
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -129,34 +82,35 @@ export const ResumePreview = () => {
     return <div className="flex gap-1">{bars}</div>;
   };
 
-  // Render Professional Template
+  // Render Professional Template with fixed styling for better PDF export
   const renderProfessionalTemplate = () => (
-    <div className="text-sm max-w-full overflow-hidden">
+    <div className="text-sm p-4 max-w-full overflow-hidden print:p-0">
       {/* Header with Personal Info */}
-      <div className="mb-6">
-        <div className="flex items-start gap-4">
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row items-start gap-6">
           {personalInfo.photo && (
             <img
               src={personalInfo.photo}
               alt="Profile"
-              className="w-24 h-24 rounded-md object-cover"
+              className="w-28 h-28 rounded-md object-cover flex-shrink-0 mb-4 sm:mb-0"
             />
           )}
 
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">
+          <div className="w-full">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {personalInfo.firstName} {personalInfo.lastName}
             </h1>
             {personalInfo.jobTitle && (
-              <p className="text-lg text-gray-600 mb-2">
+              <p className="text-lg text-gray-600 mb-4">
                 {personalInfo.jobTitle}
               </p>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-gray-600">
+            {/* Contact Info - Single column layout for better spacing */}
+            <div className="flex flex-col space-y-2 mb-2">
               {(personalInfo.city || personalInfo.country) && (
-                <div className="flex items-center gap-1">
-                  <MapPin size={14} />
+                <div className="flex items-center gap-2">
+                  <MapPin size={16} className="flex-shrink-0 text-gray-600" />
                   <span>
                     {[personalInfo.city, personalInfo.country]
                       .filter(Boolean)
@@ -166,28 +120,30 @@ export const ResumePreview = () => {
               )}
 
               {personalInfo.phone && (
-                <div className="flex items-center gap-1">
-                  <Phone size={14} />
+                <div className="flex items-center gap-2">
+                  <Phone size={16} className="flex-shrink-0 text-gray-600" />
                   <span>{personalInfo.phone}</span>
                 </div>
               )}
 
               {personalInfo.email && (
-                <div className="flex items-center gap-1">
-                  <Mail size={14} />
+                <div className="flex items-center gap-2">
+                  <Mail size={16} className="flex-shrink-0 text-gray-600" />
                   <span>{personalInfo.email}</span>
                 </div>
               )}
+            </div>
 
-              {/* Social Media Links */}
+            {/* Links in a separate section with improved layout */}
+            <div className="flex flex-wrap gap-4 mt-2">
               {personalInfo.linkedin && (
                 <div className="flex items-center gap-1">
-                  <Linkedin size={14} />
+                  <Linkedin size={16} className="flex-shrink-0 text-gray-600" />
                   <a
                     href={personalInfo.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600"
                   >
                     LinkedIn
                   </a>
@@ -196,12 +152,12 @@ export const ResumePreview = () => {
 
               {personalInfo.github && (
                 <div className="flex items-center gap-1">
-                  <Github size={14} />
+                  <Github size={16} className="flex-shrink-0 text-gray-600" />
                   <a
                     href={personalInfo.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600"
                   >
                     GitHub
                   </a>
@@ -210,28 +166,27 @@ export const ResumePreview = () => {
 
               {personalInfo.website && (
                 <div className="flex items-center gap-1">
-                  <Globe size={14} />
+                  <Globe size={16} className="flex-shrink-0 text-gray-600" />
                   <a
                     href={personalInfo.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600"
                   >
                     Website
                   </a>
                 </div>
               )}
 
-              {/* Additional Custom Links */}
               {personalInfo.additionalLinks &&
                 personalInfo.additionalLinks.map((link) => (
                   <div key={link.id} className="flex items-center gap-1">
-                    <Link size={14} />
+                    <Link size={16} className="flex-shrink-0 text-gray-600" />
                     <a
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600"
                     >
                       {link.label}
                     </a>
@@ -244,8 +199,8 @@ export const ResumePreview = () => {
 
       {/* Summary Section */}
       {summary && (
-        <div className="mb-6">
-          <h2 className="text-base font-semibold text-gray-900 border-b pb-1 mb-2">
+        <div className="mb-8">
+          <h2 className="text-base font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-3">
             Professional Summary
           </h2>
           <p className="text-gray-700 whitespace-pre-line">{summary}</p>
@@ -254,12 +209,12 @@ export const ResumePreview = () => {
 
       {/* Skills Section */}
       {skills.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-base font-semibold text-gray-900 border-b pb-1 mb-2">
+        <div className="mb-8">
+          <h2 className="text-base font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-3">
             Skills
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {skills.map((skill, index) => (
               <div key={skill.id || index}>
                 <div className="flex justify-between mb-1">
@@ -274,33 +229,35 @@ export const ResumePreview = () => {
 
       {/* Work Experience Section */}
       {workExperience.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-base font-semibold text-gray-900 border-b pb-1 mb-2">
+        <div className="mb-8">
+          <h2 className="text-base font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-3">
             Work Experience
           </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {workExperience.map((exp, index) => (
               <div key={exp.id || index}>
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="max-w-[70%]">
+                    {" "}
+                    {/* Added max-width control */}
                     <h3 className="font-medium text-gray-900">
                       {exp.position}
                     </h3>
                     <div className="flex items-center gap-1 text-gray-700">
-                      <Building size={14} />
-                      <span>{exp.company}</span>
+                      <Building size={14} className="flex-shrink-0" />
+                      <span className="truncate">{exp.company}</span>
                       {exp.location && (
                         <>
                           <span className="mx-1">•</span>
-                          <span>{exp.location}</span>
+                          <span className="truncate">{exp.location}</span>
                         </>
                       )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1 text-gray-600 whitespace-nowrap">
-                    <Calendar size={14} />
+                    <Calendar size={14} className="flex-shrink-0" />
                     <span>
                       {getDuration(exp.startDate, exp.endDate, exp.current)}
                     </span>
@@ -320,29 +277,31 @@ export const ResumePreview = () => {
 
       {/* Projects Section */}
       {projects.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-base font-semibold text-gray-900 border-b pb-1 mb-2">
+        <div className="mb-8">
+          <h2 className="text-base font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-3">
             Projects
           </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {projects.map((project, index) => (
               <div key={project.id || index}>
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="max-w-[70%]">
+                    {" "}
+                    {/* Added max-width control */}
                     <h3 className="font-medium text-gray-900">
                       {project.title}
                     </h3>
                     {project.technologies && (
                       <div className="flex items-center gap-1 text-gray-700">
-                        <Code size={14} />
-                        <span>{project.technologies}</span>
+                        <Code size={14} className="flex-shrink-0" />
+                        <span className="truncate">{project.technologies}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="flex items-center gap-1 text-gray-600 whitespace-nowrap">
-                    <Calendar size={14} />
+                    <Calendar size={14} className="flex-shrink-0" />
                     <span>
                       {getDuration(
                         project.startDate,
@@ -361,26 +320,16 @@ export const ResumePreview = () => {
 
                 <div className="mt-2 flex gap-3">
                   {project.githubUrl && (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline flex items-center gap-1 text-xs"
-                    >
-                      <Github size={12} />
+                    <div className="text-blue-600 flex items-center gap-1 text-xs">
+                      <Github size={12} className="flex-shrink-0" />
                       <span>GitHub</span>
-                    </a>
+                    </div>
                   )}
                   {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline flex items-center gap-1 text-xs"
-                    >
-                      <ExternalLink size={12} />
+                    <div className="text-blue-600 flex items-center gap-1 text-xs">
+                      <ExternalLink size={12} className="flex-shrink-0" />
                       <span>Live Demo</span>
-                    </a>
+                    </div>
                   )}
                 </div>
               </div>
@@ -389,38 +338,36 @@ export const ResumePreview = () => {
         </div>
       )}
 
-      {/* Education Section */}
+      {/* Education Section - Fixed visibility issues */}
       {education.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-base font-semibold text-gray-900 border-b pb-1 mb-2">
+        <div className="mb-8">
+          <h2 className="text-base font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-3">
             Education
           </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {education.map((edu, index) => (
               <div key={edu.id || index}>
                 <div className="flex justify-between items-start">
-                  <div>
+                  <div className="max-w-[70%]">
+                    {" "}
+                    {/* Added max-width control */}
                     <h3 className="font-medium text-gray-900">{edu.degree}</h3>
                     <div className="flex items-center gap-1 text-gray-700">
-                      <GraduationCap size={14} />
-                      <span>{edu.institution}</span>
+                      <GraduationCap size={14} className="flex-shrink-0" />
+                      <span className="truncate">{edu.institution}</span>
                       {edu.location && (
                         <>
                           <span className="mx-1">•</span>
-                          <span>{edu.location}</span>
+                          <span className="truncate">{edu.location}</span>
                         </>
                       )}
                     </div>
                     {(edu.grade || edu.percentage || edu.percentileRank) && (
-                      <div className="text-gray-700 text-sm mt-1">
-                        {edu.grade && (
-                          <span className="mr-2">Grade: {edu.grade}</span>
-                        )}
+                      <div className="text-gray-700 text-sm mt-2 flex flex-wrap gap-3">
+                        {edu.grade && <span>Grade: {edu.grade}</span>}
                         {edu.percentage && (
-                          <span className="mr-2">
-                            Percentage: {edu.percentage}
-                          </span>
+                          <span>Percentage: {edu.percentage}</span>
                         )}
                         {edu.percentileRank && (
                           <span>Percentile: {edu.percentileRank}</span>
@@ -430,7 +377,7 @@ export const ResumePreview = () => {
                   </div>
 
                   <div className="flex items-center gap-1 text-gray-600 whitespace-nowrap">
-                    <Calendar size={14} />
+                    <Calendar size={14} className="flex-shrink-0" />
                     <span>
                       {getDuration(edu.startDate, edu.endDate, edu.current)}
                     </span>
@@ -448,22 +395,25 @@ export const ResumePreview = () => {
         </div>
       )}
 
-      {/* Certificates Section */}
+      {/* Certificates Section - Fixed visibility issues */}
       {certificates.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-base font-semibold text-gray-900 border-b pb-1 mb-2">
+        <div className="mb-8">
+          <h2 className="text-base font-semibold text-gray-900 border-b border-gray-300 pb-2 mb-3">
             Certificates
           </h2>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {certificates.map((cert, index) => (
               <div key={cert.id || index} className="flex items-start">
-                <Award size={16} className="text-gray-600 mr-2 mt-0.5" />
+                <Award
+                  size={16}
+                  className="text-gray-600 mr-2 mt-0.5 flex-shrink-0"
+                />
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-gray-900">{cert.name}</h3>
                     {cert.date && (
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-gray-500 text-xs whitespace-nowrap">
                         ({formatDate(cert.date)})
                       </span>
                     )}
@@ -474,15 +424,10 @@ export const ResumePreview = () => {
                     </p>
                   )}
                   {cert.url && (
-                    <a
-                      href={cert.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-xs inline-flex items-center gap-1 mt-1"
-                    >
-                      <ExternalLink size={10} />
+                    <div className="text-blue-600 text-xs flex items-center gap-1 mt-1">
+                      <ExternalLink size={10} className="flex-shrink-0" />
                       <span>View Certificate</span>
-                    </a>
+                    </div>
                   )}
                 </div>
               </div>
@@ -542,11 +487,13 @@ export const ResumePreview = () => {
           )}
 
           {personalInfo.email && (
-            <div className="flex items-center gap-2 overflow-hidden">
-              <Mail size={14} className="text-gray-600 flex-shrink-0" />
-              <span className="text-gray-700 truncate w-full">
-                {personalInfo.email}
-              </span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <Mail size={14} className="text-gray-600 flex-shrink-0" />
+                <span className="text-gray-700 break-all">
+                  {personalInfo.email}
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -577,7 +524,7 @@ export const ResumePreview = () => {
           <h2 className="text-sm font-semibold uppercase tracking-wider mb-3">
             Links
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-2 overflow-hidden">
             {personalInfo.linkedin && (
               <div className="flex items-center gap-2 overflow-hidden">
                 <Linkedin size={14} className="text-gray-600 flex-shrink-0" />
@@ -912,10 +859,10 @@ export const ResumePreview = () => {
   );
 
   return (
-    <>
+    <div className="print:m-0 print:shadow-none">
       {template === ResumeTemplate.MODERN
         ? renderModernTemplate()
         : renderProfessionalTemplate()}
-    </>
+    </div>
   );
 };

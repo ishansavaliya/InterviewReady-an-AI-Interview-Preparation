@@ -57,34 +57,10 @@ export const Projects = ({ onPrevious, onNext }: ProjectsProps) => {
       return;
     }
 
-    // Create a project object with ID
-    const newProject = {
-      ...newEntry,
-      id: Math.random().toString(36).substring(2, 9),
-    };
+    // Add to context directly
+    addProject(newEntry);
 
-    // Add to context
-    addProject(newProject);
-
-    // Also directly update localStorage to ensure it's saved immediately
-    try {
-      const savedData = localStorage.getItem("resumeData");
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        parsedData.projects = [...(parsedData.projects || []), newProject];
-        localStorage.setItem("resumeData", JSON.stringify(parsedData));
-        console.log("Project added directly to localStorage:", newProject);
-        alert(
-          "Project added successfully! Click the Refresh button in the preview to see it."
-        );
-      }
-    } catch (e) {
-      console.error("Error updating localStorage:", e);
-      alert(
-        "Project added, but there was an issue saving it. Please try refreshing the page."
-      );
-    }
-
+    // Reset form
     setNewEntry(emptyProject);
     setEditing(false);
   };
@@ -95,7 +71,6 @@ export const Projects = ({ onPrevious, onNext }: ProjectsProps) => {
     field: string,
     value: string | boolean
   ) => {
-    console.log(`Updating project ${id}, field: ${field}, value:`, value);
     updateProject(id, { [field]: value });
   };
 

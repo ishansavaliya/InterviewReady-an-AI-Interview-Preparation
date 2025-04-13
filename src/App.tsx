@@ -40,8 +40,6 @@ const App = () => {
         {/* Public Routes Section - Accessible to all users */}
         <Route element={<PublicLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/resume" element={<ResumeBuilder />} />
-          <Route path="/chatbot" element={<ComingSoon />} />
           <Route path="/services" element={<Services />} />
         </Route>
 
@@ -59,6 +57,12 @@ const App = () => {
             </ProtectRoutes>
           }
         >
+          {/* Resume Builder Route */}
+          <Route path="/resume" element={<ResumeBuilder />} />
+
+          {/* AI Chatbot Route */}
+          <Route path="/chatbot" element={<ComingSoon />} />
+
           {/* Interview Generation and Management Routes */}
           <Route element={<Generate />} path="/generate">
             <Route index element={<Dashboard />} />

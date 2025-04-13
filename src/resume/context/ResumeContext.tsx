@@ -195,36 +195,32 @@ export const ResumeContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  // Initialize state from localStorage if available, otherwise use default
+  // Initialize with data from localStorage or default if none exists
   const [resumeData, setResumeData] = useState<ResumeData>(() => {
-    const savedData = localStorage.getItem("resumeData");
-    if (savedData) {
+    // Try to get stored data from localStorage
+    const storedData = localStorage.getItem("resumeBuilderData");
+
+    // If data exists in localStorage, parse and return it
+    if (storedData) {
       try {
-        return JSON.parse(savedData);
-      } catch (e) {
-        console.error("Error parsing saved resume data:", e);
+        return JSON.parse(storedData);
+      } catch (error) {
+        console.error("Failed to parse stored resume data:", error);
         return defaultResumeData;
       }
     }
+
+    // Otherwise return default data
     return defaultResumeData;
   });
 
   // Save to localStorage whenever resumeData changes
   useEffect(() => {
-    localStorage.setItem("resumeData", JSON.stringify(resumeData));
-    console.log(
-      "ResumeData state updated and saved to localStorage:",
-      resumeData
-    );
-    console.log("Projects count:", resumeData.projects.length);
-    console.log("Certificates count:", resumeData.certificates.length);
-  }, [resumeData]);
-
-  // Debug state changes
-  useEffect(() => {
-    console.log("ResumeData state updated:", resumeData);
-    console.log("Projects count:", resumeData.projects.length);
-    console.log("Certificates count:", resumeData.certificates.length);
+    try {
+      localStorage.setItem("resumeBuilderData", JSON.stringify(resumeData));
+    } catch (error) {
+      console.error("Failed to save resume data to localStorage:", error);
+    }
   }, [resumeData]);
 
   // Template method
@@ -328,13 +324,11 @@ export const ResumeContextProvider = ({
 
   // Projects methods
   const addProject = (item: Omit<ResumeData["projects"][0], "id">) => {
-    console.log("ResumeContext - Adding project:", item);
     setResumeData((prev) => {
       const updated = {
         ...prev,
         projects: [...prev.projects, { ...item, id: generateId() }],
       };
-      console.log("ResumeContext - Updated projects:", updated.projects);
       return updated;
     });
   };
@@ -343,7 +337,6 @@ export const ResumeContextProvider = ({
     id: string,
     data: Partial<Omit<ResumeData["projects"][0], "id">>
   ) => {
-    console.log(`ResumeContext - Updating project ${id}:`, data);
     setResumeData((prev) => {
       const updated = {
         ...prev,
@@ -351,7 +344,6 @@ export const ResumeContextProvider = ({
           item.id === id ? { ...item, ...data } : item
         ),
       };
-      console.log("ResumeContext - Updated projects:", updated.projects);
       return updated;
     });
   };
@@ -419,16 +411,11 @@ export const ResumeContextProvider = ({
 
   // Certificates methods
   const addCertificate = (item: Omit<ResumeData["certificates"][0], "id">) => {
-    console.log("ResumeContext - Adding certificate:", item);
     setResumeData((prev) => {
       const updated = {
         ...prev,
         certificates: [...prev.certificates, { ...item, id: generateId() }],
       };
-      console.log(
-        "ResumeContext - Updated certificates:",
-        updated.certificates
-      );
       return updated;
     });
   };
@@ -437,7 +424,6 @@ export const ResumeContextProvider = ({
     id: string,
     data: Partial<Omit<ResumeData["certificates"][0], "id">>
   ) => {
-    console.log(`ResumeContext - Updating certificate ${id}:`, data);
     setResumeData((prev) => {
       const updated = {
         ...prev,
@@ -445,10 +431,6 @@ export const ResumeContextProvider = ({
           item.id === id ? { ...item, ...data } : item
         ),
       };
-      console.log(
-        "ResumeContext - Updated certificates:",
-        updated.certificates
-      );
       return updated;
     });
   };

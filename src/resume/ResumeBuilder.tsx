@@ -69,15 +69,7 @@ const ResumeBuilderContent = () => {
 
   // Monitor changes to resumeData
   useEffect(() => {
-    console.log("ResumeBuilderContent: resumeData updated");
-    console.log(
-      "ResumeBuilderContent: projects count",
-      resumeData.projects.length
-    );
-    console.log(
-      "ResumeBuilderContent: certificates count",
-      resumeData.certificates.length
-    );
+    // Empty useEffect to maintain functionality without logging
   }, [resumeData]);
 
   // Handle step navigation
@@ -88,12 +80,38 @@ const ResumeBuilderContent = () => {
     if (!resumePreviewRef.current) return;
 
     try {
+      // Add a class for PDF export optimization
+      resumePreviewRef.current.classList.add("pdf-export-mode");
+
+      // Create a temporary style element for PDF export
+      const styleElement = document.createElement("style");
+      styleElement.textContent = `
+        .pdf-export-mode {
+          width: 794px !important; /* Force A4 width */
+          padding: 40px !important;
+          background-color: white !important;
+        }
+        .pdf-export-mode a { text-decoration: none !important; }
+        .pdf-export-mode .truncate { 
+          white-space: normal !important; 
+          overflow: visible !important;
+        }
+        .pdf-export-mode .break-all { word-break: normal !important; }
+      `;
+      document.head.appendChild(styleElement);
+
+      // Use html2canvas with improved settings
       const canvas = await html2canvas(resumePreviewRef.current, {
-        scale: 2,
+        scale: 3, // Higher scale for better quality
         useCORS: true,
         logging: false,
+        backgroundColor: "#ffffff",
+        allowTaint: true,
+        removeContainer: false,
+        foreignObjectRendering: false, // Disable for better compatibility
       });
 
+      // Create the PDF with proper dimensions
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -102,28 +120,45 @@ const ResumeBuilderContent = () => {
       });
 
       // Calculate dimensions
-      const imgWidth = 210; // A4 width in mm
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgWidth = pageWidth - 20; // Add margins
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      // Add the image to the PDF
+      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
 
-      // Use name for the file if available, otherwise use 'resume'
+      // Generate filename
       const fileName =
         resumeData.personalInfo.firstName && resumeData.personalInfo.lastName
           ? `${resumeData.personalInfo.firstName.toLowerCase()}_${resumeData.personalInfo.lastName.toLowerCase()}_resume.pdf`
           : "resume.pdf";
 
+      // Save the PDF
       pdf.save(fileName);
+
+      // Clean up
+      resumePreviewRef.current.classList.remove("pdf-export-mode");
+      document.head.removeChild(styleElement);
     } catch (error) {
       console.error("Error exporting PDF:", error);
       alert("Failed to export PDF. Please try again.");
+
+      // Clean up on error
+      if (resumePreviewRef.current) {
+        resumePreviewRef.current.classList.remove("pdf-export-mode");
+      }
+      const styleElement = document.querySelector("style[data-pdf-export]");
+      if (styleElement) {
+        document.head.removeChild(styleElement);
+      }
     }
   };
 
   // Export as DOCX
   const handleExportDOCX = () => {
     try {
-      // Create a new document
+      // Create a new document with improved styling
       const doc = new Document({
         styles: {
           paragraphStyles: [
@@ -134,9 +169,12 @@ const ResumeBuilderContent = () => {
               next: "Normal",
               quickFormat: true,
               run: {
-                size: 28,
+                size: 32, // Increased size for better prominence
                 bold: true,
                 color: "000000",
+              },
+              paragraph: {
+                spacing: { after: 240 },
               },
             },
             {
@@ -146,9 +184,20 @@ const ResumeBuilderContent = () => {
               next: "Normal",
               quickFormat: true,
               run: {
-                size: 24,
+                size: 28, // Increased size
                 bold: true,
                 color: "000000",
+              },
+              paragraph: {
+                spacing: { before: 300, after: 240 },
+                border: {
+                  bottom: {
+                    color: "CCCCCC",
+                    size: 1,
+                    space: 8,
+                    style: "single",
+                  },
+                },
               },
             },
             {
@@ -157,11 +206,12 @@ const ResumeBuilderContent = () => {
               basedOn: "Normal",
               next: "Normal",
               run: {
-                size: 22,
+                size: 24, // Increased for better readability
               },
               paragraph: {
                 spacing: {
                   line: 276,
+                  after: 200,
                 },
               },
             },
@@ -169,7 +219,16 @@ const ResumeBuilderContent = () => {
         },
         sections: [
           {
-            properties: {},
+            properties: {
+              page: {
+                margin: {
+                  top: 1000,
+                  right: 1000,
+                  bottom: 1000,
+                  left: 1000,
+                },
+              },
+            },
             children: [
               // Header with name and job title
               new Paragraph({
@@ -183,6 +242,7 @@ const ResumeBuilderContent = () => {
                     text: resumeData.personalInfo.jobTitle,
                     alignment: AlignmentType.CENTER,
                     spacing: { after: 300 },
+                    style: "NormalParagraph",
                   })
                 : new Paragraph({}),
 
@@ -214,7 +274,7 @@ const ResumeBuilderContent = () => {
                 spacing: { after: 300 },
               }),
 
-              // Links Section
+              // Links Section with improved formatting
               resumeData.personalInfo.linkedin ||
               resumeData.personalInfo.github ||
               resumeData.personalInfo.website
@@ -380,14 +440,16 @@ const ResumeBuilderContent = () => {
                   })
                 : new Paragraph({}),
 
-              resumeData.skills.length > 0
-                ? new Paragraph({
-                    text: resumeData.skills
-                      .map((skill) => skill.name)
-                      .join(", "),
-                    spacing: { after: 400 },
+              ...resumeData.skills.map(
+                (skill) =>
+                  new Paragraph({
+                    children: [
+                      new TextRun({ text: `${skill.name}: `, bold: true }),
+                      new TextRun({ text: getSkillLevelText(skill.level) }),
+                    ],
+                    spacing: { after: 120 },
                   })
-                : new Paragraph({}),
+              ),
 
               // Certificates Section
               resumeData.certificates.length > 0
@@ -507,7 +569,12 @@ const ResumeBuilderContent = () => {
         );
       case BuilderStep.CERTIFICATES:
         return (
-          <Certificates onPrevious={() => goToStep(BuilderStep.EDUCATION)} />
+          <Certificates
+            onPrevious={() => goToStep(BuilderStep.EDUCATION)}
+            onExportPDF={handleExportPDF}
+            onExportDOCX={handleExportDOCX}
+            onPrint={handlePrint}
+          />
         );
       default:
         return (
@@ -611,47 +678,6 @@ const ResumeBuilderContent = () => {
                   size="sm"
                   variant="outline"
                   className="flex items-center gap-1"
-                  onClick={() => {
-                    // Force refresh from localStorage
-                    const savedData = localStorage.getItem("resumeData");
-                    if (savedData) {
-                      try {
-                        const parsedData = JSON.parse(savedData);
-                        console.log(
-                          "Refreshing preview with localStorage data:",
-                          parsedData
-                        );
-                        // This will trigger a re-render
-                        window.location.reload();
-                      } catch (e) {
-                        console.error("Error refreshing data:", e);
-                      }
-                    }
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="lucide lucide-refresh-cw"
-                  >
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                    <path d="M21 3v5h-5" />
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                    <path d="M3 21v-5h5" />
-                  </svg>
-                  <span>Refresh</span>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex items-center gap-1"
                   onClick={handleExportPDF}
                 >
                   <Download size={16} />
@@ -678,8 +704,15 @@ const ResumeBuilderContent = () => {
               </div>
             </div>
             <div
-              className="border rounded-md p-4 bg-gray-50"
+              className="border rounded-md bg-white shadow-sm"
               ref={resumePreviewRef}
+              style={{
+                width: "100%",
+                maxWidth: "794px", // A4 width in pixels
+                margin: "0 auto",
+                padding: "24px", // Add padding for better content display
+                boxSizing: "border-box",
+              }}
             >
               <ResumePreview />
             </div>
@@ -722,3 +755,10 @@ const StepConnector = () => (
     <span>›</span>
   </div>
 );
+// Create a visual representation of skill level for DOCX
+const getSkillLevelText = (level: number) => {
+  const maxLevel = 5;
+  const filled = "★".repeat(level);
+  const empty = "☆".repeat(maxLevel - level);
+  return `${filled}${empty}`;
+};

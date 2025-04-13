@@ -9,9 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useResumeContext } from "../context/ResumeContext";
 import { Trash2, Plus, Link as LinkIcon } from "lucide-react";
+import { ResumeCompleteModal } from "./ResumeCompleteModal"; // Import the new modal
 
 interface CertificatesProps {
   onPrevious: () => void;
+  onExportPDF: () => void;
+  onExportDOCX: () => void;
+  onPrint: () => void;
 }
 
 // Empty certificate entry template
@@ -22,13 +26,14 @@ const emptyCertificate = {
   url: "",
 };
 
-export const Certificates = ({ onPrevious }: CertificatesProps) => {
+export const Certificates = ({ onPrevious, onExportPDF, onExportDOCX, onPrint }: CertificatesProps) => {
   const { resumeData, addCertificate, updateCertificate, removeCertificate } =
     useResumeContext();
 
-  const { certificates } = resumeData;
+  const { certificates, projects } = resumeData;
   const [newEntry, setNewEntry] = useState(emptyCertificate);
   const [editing, setEditing] = useState(false);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false); // State for the modal
 
   // Handle input changes for new entry
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,40 +49,10 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
       return;
     }
 
-    // Create a certificate object with ID
-    const newCertificate = {
-      ...newEntry,
-      id: Math.random().toString(36).substring(2, 9),
-    };
+    // Add to context directly
+    addCertificate(newEntry);
 
-    // Add to context
-    addCertificate(newCertificate);
-
-    // Also directly update localStorage to ensure it's saved immediately
-    try {
-      const savedData = localStorage.getItem("resumeData");
-      if (savedData) {
-        const parsedData = JSON.parse(savedData);
-        parsedData.certificates = [
-          ...(parsedData.certificates || []),
-          newCertificate,
-        ];
-        localStorage.setItem("resumeData", JSON.stringify(parsedData));
-        console.log(
-          "Certificate added directly to localStorage:",
-          newCertificate
-        );
-        alert(
-          "Certificate added successfully! Click the Refresh button in the preview to see it."
-        );
-      }
-    } catch (e) {
-      console.error("Error updating localStorage:", e);
-      alert(
-        "Certificate added, but there was an issue saving it. Please try refreshing the page."
-      );
-    }
-
+    // Reset form
     setNewEntry(emptyCertificate);
     setEditing(false);
   };
@@ -88,7 +63,6 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
     field: string,
     value: string
   ) => {
-    console.log(`Updating certificate ${id}, field: ${field}, value: ${value}`);
     updateCertificate(id, { [field]: value });
   };
 
@@ -265,6 +239,17 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
         </Button>
       )}
 
+      {/* Add the new modal component with the passed export functions */}
+      <ResumeCompleteModal
+        isOpen={isCompleteModalOpen}
+        onClose={() => setIsCompleteModalOpen(false)}
+        projectCount={projects.length}
+        certificateCount={certificates.length}
+        onExportPDF={onExportPDF}
+        onExportDOCX={onExportDOCX}
+        onPrint={onPrint}
+      />
+
       {/* Navigation buttons */}
       <div className="flex justify-between">
         <Button type="button" onClick={onPrevious} variant="outline">
@@ -272,16 +257,7 @@ export const Certificates = ({ onPrevious }: CertificatesProps) => {
         </Button>
         <Button
           type="button"
-          onClick={() => {
-            // Show detailed success message
-            console.log("Resume completed with data:", resumeData);
-            alert(`Resume completed! 
-              You have added:
-              - ${resumeData.projects.length} projects
-              - ${resumeData.certificates.length} certificates
-              
-              You can now download your resume as PDF or DOCX.`);
-          }}
+          onClick={() => setIsCompleteModalOpen(true)} // Open the modal when Finish is clicked
           className="bg-emerald-500 hover:bg-emerald-600 text-white"
         >
           Finish
