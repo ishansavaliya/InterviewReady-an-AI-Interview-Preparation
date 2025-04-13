@@ -17,6 +17,7 @@ import { NavigationRoutes } from "./navigation-routes";
 import { NavLink } from "react-router-dom";
 import { ProfileContainer } from "./profile-container";
 import { ToggleContainer } from "./toggle-container";
+import { cn } from "@/lib/utils";
 
 /**
  * Header Component
