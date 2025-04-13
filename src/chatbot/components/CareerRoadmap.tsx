@@ -4,7 +4,6 @@ import { X, Download, FileText, File } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { jsPDF } from "jspdf";
-import { Download as DownloadIcon } from "lucide-react";
 import "jspdf-autotable";
 
 // Declare the types we're adding to the Window interface

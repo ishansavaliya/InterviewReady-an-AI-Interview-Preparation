@@ -244,10 +244,10 @@ export async function getRoadmap(career: string): Promise<string> {
    • Growth trajectory: Quantified demand forecast (2024-2030)
    • Geographic distribution: Regions with highest demand
    • Compensation analysis: Detailed salary ranges by experience level
-     - Entry level: $XX,XXX - $XX,XXX
-     - Mid-career: $XX,XXX - $XX,XXX
-     - Senior level: $XX,XXX - $XX,XXX
-     - Executive level: $XX,XXX+
+   • Entry level (1): $XX,XXX - $XX,XXX
+   • Mid-career (2): $XX,XXX - $XX,XXX
+   • Senior level (3): $XX,XXX - $XX,XXX
+   • Executive level (4): $XX,XXX+
 
 ---
 
