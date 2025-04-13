@@ -25,6 +25,7 @@ import { Feedback } from "./routes/feedback";
 import { ComingSoon } from "./components/coming-soon";
 import { ResumeBuilder } from "./resume/ResumeBuilder";
 import Services from "./routes/services";
+import ChatbotPage from "./chatbot";
 
 /**
  * App Component
@@ -61,7 +62,7 @@ const App = () => {
           <Route path="/resume" element={<ResumeBuilder />} />
 
           {/* AI Chatbot Route */}
-          <Route path="/chatbot" element={<ComingSoon />} />
+          <Route path="/chatbot" element={<ChatbotPage />} />
 
           {/* Interview Generation and Management Routes */}
           <Route element={<Generate />} path="/generate">
