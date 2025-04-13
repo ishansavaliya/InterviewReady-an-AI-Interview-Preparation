@@ -1,19 +1,28 @@
 import { jsPDF } from "jspdf";
-import { toPng } from "html-to-image";
 import type { ResumeData } from "@/resume/context/ResumeContext";
 
-// Better PDF export using html-to-image
+// PDF export helper function
 export async function generateBetterPDF(
   element: HTMLElement,
   resumeData: ResumeData
 ): Promise<string> {
-  // Calculate optimal dimensions
-  const aspectRatio = element.clientHeight / element.clientWidth;
-  const pageWidth = 210; // A4 width in mm
-  const pageHeight = 297; // A4 height in mm
-
   // Create a new PDF document
   const pdf = new jsPDF({
     orientation: "portrait",
+    unit: "mm",
+    format: "a4",
   });
+
+  try {
+    // Generate filename based on user's name
+    const fileName =
+      resumeData.personalInfo.firstName && resumeData.personalInfo.lastName
+        ? `${resumeData.personalInfo.firstName.toLowerCase()}_${resumeData.personalInfo.lastName.toLowerCase()}_resume.pdf`
+        : "resume.pdf";
+
+    return fileName;
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    throw new Error("Failed to generate PDF");
+  }
 }

@@ -4,6 +4,15 @@
  * Provides responsive navigation for smaller screens
  */
 
+import { useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { Container } from "./container";
+import { LogoContainer } from "./logo-container";
+import { Link } from "react-router-dom";
+import { Button } from "./ui/button";
+import { useLogout } from "@/hooks/useLogout";
+import { LogOut, User, FileText, Briefcase } from "lucide-react";
+import { ToggleMode } from "@/components/toggle-mode";
 import {
   Sheet,
   SheetContent,
@@ -13,9 +22,6 @@ import {
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { NavigationRoutes } from "./navigation-routes";
-import { useAuth } from "@clerk/clerk-react";
-import { NavLink } from "react-router-dom";
-import { cn } from "@/lib/utils";
 
 /**
  * ToggleContainer Component
@@ -26,7 +32,8 @@ import { cn } from "@/lib/utils";
  * - Conditional interview link for authenticated users
  */
 export const ToggleContainer = () => {
-  const { userId } = useAuth();
+  const { isSignedIn } = useAuth();
+  const { handleLogout } = useLogout();
   return (
     <Sheet>
       {/* Mobile Menu Trigger */}

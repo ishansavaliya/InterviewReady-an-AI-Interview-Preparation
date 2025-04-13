@@ -4,8 +4,13 @@
  * Provides responsive layout for desktop and mobile views
  */
 
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
+import { Button } from "./ui/button";
+import { useLogout } from "@/hooks/useLogout";
+import { LogOut, User, FileText, Moon, Sun, Briefcase } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ToggleMode } from "@/components/toggle-mode";
 import { Container } from "./container";
 import { LogoContainer } from "./logo-container";
 import { NavigationRoutes } from "./navigation-routes";
@@ -22,7 +27,8 @@ import { ToggleContainer } from "./toggle-container";
  * - Mobile menu toggle
  */
 const Header = () => {
-  const { userId } = useAuth();
+  const { isSignedIn } = useAuth();
+  const { handleLogout } = useLogout();
 
   return (
     <header

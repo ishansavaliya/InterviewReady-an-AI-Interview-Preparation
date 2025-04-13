@@ -121,7 +121,6 @@ const ResumeBuilderContent = () => {
 
       // Calculate dimensions
       const pageWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
       const imgWidth = pageWidth - 20; // Add margins
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
