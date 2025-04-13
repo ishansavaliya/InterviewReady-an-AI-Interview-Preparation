@@ -32,7 +32,7 @@ export const ProfileContainer = () => {
     <div className="flex items-center gap-6">
       {isSignedIn ? (
         // Show user profile button for authenticated users
-        <UserButton afterSignOutUrl="/generate" />
+        <UserButton afterSignOutUrl="/" />
       ) : (
         // Show sign-in button for unauthenticated users
         <Link to={"/signin"}>
