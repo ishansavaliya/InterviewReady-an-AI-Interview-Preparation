@@ -33,11 +33,17 @@ const ChatInterface: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    // Only scroll if roadmap is not being displayed
+    if (!roadmapContent) {
+      scrollToBottom();
+    }
+  }, [messages, roadmapContent]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Don't scroll if roadmap is open
+    if (!roadmapContent) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   const handleSendMessage = async (text: string) => {
@@ -57,8 +63,10 @@ const ChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Scroll to show loading indicator
-      setTimeout(scrollToBottom, 100);
+      // Scroll to show loading indicator only if roadmap is not open
+      if (!roadmapContent) {
+        setTimeout(scrollToBottom, 100);
+      }
 
       // Get response from AI
       const response = await getCareerAdvice(text);
@@ -107,8 +115,10 @@ const ChatInterface: React.FC = () => {
     // Set loading state
     setIsLoading(true);
 
-    // Scroll to show loading indicator
-    setTimeout(scrollToBottom, 100);
+    // Scroll to show loading indicator only if roadmap is not open
+    if (!roadmapContent) {
+      setTimeout(scrollToBottom, 100);
+    }
 
     try {
       // Get roadmap from AI
@@ -162,8 +172,10 @@ const ChatInterface: React.FC = () => {
     // Set loading state
     setIsLoading(true);
 
-    // Scroll to show loading indicator
-    setTimeout(scrollToBottom, 100);
+    // Scroll to show loading indicator only if roadmap is not open
+    if (!roadmapContent) {
+      setTimeout(scrollToBottom, 100);
+    }
 
     try {
       // Get skills advice from AI
@@ -231,8 +243,10 @@ const ChatInterface: React.FC = () => {
       // Set loading state
       setIsLoading(true);
 
-      // Scroll to show loading indicator
-      setTimeout(scrollToBottom, 100);
+      // Scroll to show loading indicator only if roadmap is not open
+      if (!roadmapContent) {
+        setTimeout(scrollToBottom, 100);
+      }
 
       try {
         // Get roadmap from AI

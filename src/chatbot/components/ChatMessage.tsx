@@ -95,7 +95,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             // Consistent spacing for all list items
             "[&_ul>li]:pl-0 [&_ol>li]:pl-0",
             // Remove italic styling
-            "prose-em:not-italic"
+            "prose-em:not-italic",
+            // Ensure proper list display
+            "[&_ul]:list-outside [&_ol]:list-outside",
+            "[&_li]:marker:visible",
+            "[&_ol>li]:pl-1",
+            "[&_ul>li]:pl-1"
           )}
         >
           {isBot ? (
@@ -119,8 +124,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                     className="text-md font-bold text-purple-700 pb-1 pt-3 mb-3"
                   />
                 ),
-                li: ({ node, ...props }) => (
-                  <li {...props} className="mb-2 py-0 block w-full" />
+                li: ({ node, children, ...props }) => (
+                  <li {...props} className="mb-2 py-0 block w-full list-item">
+                    {children}
+                  </li>
                 ),
                 ul: ({ node, ...props }) => (
                   <ul
