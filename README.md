@@ -17,21 +17,34 @@ InterviewReady is an AI-driven platform designed to help users prepare for job i
 
 ## Features
 
-### Core Features
+### 🔹 1. Interview Module
 
-- AI-powered mock interview sessions
-- Real-time feedback and performance analysis
-- Personalized interview questions based on job roles and experience
-- User authentication and profile management
-- Dashboard to manage and track interview sessions
-- Feedback reports with ratings and improvement suggestions
+- AI-powered **mock interview sessions** tailored to specific job roles and experience levels  
+- Dynamic question generation using **LLMs and NLP**  
+- **Real-time feedback** with fluency, relevance, and confidence analysis  
+- Support for **voice-based responses** via speech-to-text  
+- **Session history and progress tracking** dashboard  
+- Follow-up questions to simulate multi-step interviews (technical, HR, behavioral)  
+- Webcam integration for **realistic interview simulation**
 
-### Additional Features
+### 🔹 2. AI Career Chatbot
 
-- Speech-to-text for answer recording
-- Webcam integration for a realistic interview experience
-- Secure data storage with Firebase Firestore
-- Responsive design for seamless use across devices
+- AI-driven chatbot trained for **career guidance and interview help**  
+- Users can ask **role-specific questions**, resume suggestions, or general job advice  
+- Uses natural language understanding to deliver **context-aware responses**  
+- Continuously improved via reinforcement learning and **user feedback**  
+- Seamlessly integrated into the dashboard for quick access  
+- Real-time typing animation and suggestions for enhanced UX  
+
+### 🔹 3. Resume Builder
+
+- Fully interactive **resume creation interface**  
+- Pre-built sections: personal info, education, experience, skills, and projects  
+- Real-time **resume preview panel** with responsive design  
+- Option to **download resume as PDF** using `jsPDF` and `html2canvas`  
+- Multiple **template styles and formatting options**  
+- Resume data securely saved via **Firebase Firestore**  
+- Works on mobile and desktop with responsive layout  
 
 ---
 
@@ -123,3 +136,9 @@ npm run dev
 ## License
 
 This project is licensed under the ISC License.
+
+
+<img width="1426" alt="Screenshot 2025-04-14 at 2 26 54 PM" src="https://github.com/user-attachments/assets/f4d2443d-39f2-49dc-92a6-87b516cb1b22" />
+<img width="1426" alt="Screenshot 2025-04-14 at 2 29 53 PM" src="https://github.com/user-attachments/assets/7ad29652-44fe-4d97-8260-8f93f6c59ecf" />
+<img width="1426" alt="Screenshot 2025-04-14 at 2 26 29 PM" src="https://github.com/user-attachments/assets/72aeb4a6-d605-439a-9e31-716605399198" />
+<img width="1426" alt="Screenshot 2025-04-14 at 2 25 59 PM" src="https://github.com/user-attachments/assets/037e11c4-b6da-48ad-920f-8fa05c830dd8" />
