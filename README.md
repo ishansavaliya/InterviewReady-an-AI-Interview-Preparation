@@ -137,8 +137,20 @@ npm run dev
 
 This project is licensed under the ISC License.
 
+---
 
 <img width="1426" alt="Screenshot 2025-04-14 at 2 26 54 PM" src="https://github.com/user-attachments/assets/f4d2443d-39f2-49dc-92a6-87b516cb1b22" />
+
+---
+
 <img width="1426" alt="Screenshot 2025-04-14 at 2 29 53 PM" src="https://github.com/user-attachments/assets/7ad29652-44fe-4d97-8260-8f93f6c59ecf" />
+
+---
+
 <img width="1426" alt="Screenshot 2025-04-14 at 2 26 29 PM" src="https://github.com/user-attachments/assets/72aeb4a6-d605-439a-9e31-716605399198" />
+
+---
+
 <img width="1426" alt="Screenshot 2025-04-14 at 2 25 59 PM" src="https://github.com/user-attachments/assets/037e11c4-b6da-48ad-920f-8fa05c830dd8" />
+
+---
